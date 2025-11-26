@@ -103,65 +103,24 @@
         <div id="main-wrapper" class="layout-main-wrapper clearfix">
           <div id="main" class="">
             <div class="row-offcanvas row-offcanvas-left clearfix">
-<main class="main-content col" id="content" role="main">
-  <section class="section">
-    <div class="container">
-      <div class="section-content" style="background:white; border-radius:12px; padding:30px; margin-bottom:30px;">
-        <h1 class="text-center mb-4">Join Earnly — Verify & Apply</h1>
-        <p class="lead text-center mb-4">Complete your application with secure ID verification.</p>
+              <main class="main-content col" id="content" role="main">
+                <section class="section">
+                  <div class="container">
+                    <div id="form-container">
+                      <!-- Formester Embed -->
+                          <script src="https://osrqajyl.formester.com/widget/standard.js" type="module"></script>
 
-        <!-- Sumsub WebSDK Container -->
-        <div id="sumsub-websdk-container" style="width:100%; min-height:800px; border:1px solid #eee; border-radius:8px;"></div>
-
-        <!-- SDK Script -->
-        <script src="https://static.sumsub.com/idensic/static/sns-websdk-builder.js"></script>
-        <script>
-          // Fetch access token from your Vercel function
-          fetch('/api/token')
-            .then(response => response.json())
-            .then(({ accessToken, error }) => {
-              if (error) {
-                document.getElementById('sumsub-websdk-container').innerHTML = 
-                  '<p style="color:red; text-align:center; padding:40px;">Failed to load verification. Please refresh.</p>';
-                return;
-              }
-
-              // Launch WebSDK 2.0
-              let snsWebSdkInstance = window.snsWebSdk
-                .init(
-                  accessToken,
-                  () => fetch('/api/token').then(r => r.json()).then(data => data.accessToken)
-                )
-                .withConf({ lang: "en" })
-                .withOptions({ adaptIframeHeight: true })
-                .on("idCheck.onMessage", (type, payload) => {
-                  if (type === "idCheck.finished") {
-                    if (payload.reviewResult.reviewAnswer === "GREEN") {
-                      alert("✅ Verification successful! Thank you.");
-                    } else {
-                      alert("❌ Verification failed. Please contact support.");
-                    }
-                  }
-                })
-                .on("idCheck.onError", (error) => {
-                  console.error("Sumsub error:", error);
-                  document.getElementById('sumsub-websdk-container').innerHTML = 
-                    '<p style="color:red; text-align:center; padding:40px;">Verification error. Please try again later.</p>';
-                })
-                .build();
-
-              snsWebSdkInstance.launch("#sumsub-websdk-container");
-            })
-            .catch(err => {
-              console.error("Fetch error:", err);
-              document.getElementById('sumsub-websdk-container').innerHTML = 
-                '<p style="color:red; text-align:center; padding:40px;">Unable to connect. Please check your internet.</p>';
-            });
-        </script>
-      </div>
-    </div>
-  </section>
-</main>
+                                <formester-standard-form
+                                      set-auto-height="true"
+                                      height="100%"
+                                      width="100%"
+                                      id="bDfu2Yv2G"
+                                      url="https://osrqajyl.formester.com/f/bDfu2Yv2G"
+                                ></formester-standard-form>
+                    </div>
+                  </div>
+                </section>
+              </main>
             </div>
           </div>
         </div>

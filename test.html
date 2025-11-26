@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sumsub Test</title>
+</head>
+<body>
+  <h2>Test Sumsub SDK</h2>
+  <div id="sumsub-container" style="border:1px solid #ccc; padding:20px; margin:20px;"></div>
+
+  <script src="https://static.sumsub.com/idensic/static/sns-websdk-builder.js"></script>
+  <script>
+    window.SNSWebSdkBuilder(null, null, 'https://api.sumsub.com')
+      .withAccessTokenProvider(() =>
+        fetch('https://api.sumsub.com/resources/accessTokens?ttlInSecs=600', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            appId: 'sbx:lRlxFT7jYTJAog6Yd7r9aNNZ.Z0xWBbHHPgFWDyLZ4SNsjBnQIEgAK7Bk'
+          })
+        }).then(r => r.json()).then(d => d.token)
+      )
+      .withContainerId('sumsub-container')
+      .build()
+      .launch();
+  </script>
+</body>
+</html>

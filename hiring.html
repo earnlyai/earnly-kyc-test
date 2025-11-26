@@ -106,53 +106,47 @@
 <main class="main-content col" id="content" role="main">
   <section class="section">
     <div class="container">
-      <div class="section-content" style="background:white; border-radius:12px; padding:30px; margin-bottom:30px;">
+      <div class="section-content" style="background:white; padding:30px; border-radius:12px;">
         <h1 class="text-center mb-4">Join Earnly — Verify & Apply</h1>
-        <p class="lead text-center mb-4">Complete your application with secure ID verification.</p>
 
-        <!-- Sumsub WebSDK Container -->
-        <div id="sumsub-websdk-container" style="width:100%; min-height:800px; border:1px solid #eee; border-radius:8px;"></div>
+        <!-- Sumsub Container -->
+        <div id="sumsub-websdk-container" style="min-height:800px; width:100%;"></div>
 
-        <!-- SDK Script -->
+        <!-- Sumsub SDK -->
         <script src="https://static.sumsub.com/idensic/static/sns-websdk-builder.js"></script>
-       <script>
-  let snsWebSdkInstance;
+        <script>
+          async function getAccessToken() {
+            const res = await fetch('/api/token');
+            const { accessToken } = await res.json();
+            return accessToken;
+          }
 
-  async function getAccessToken() {
-    const res = await fetch('/api/token');
-    const { accessToken } = await res.json();
-    return accessToken;
-  }
+          async function launchWebSdk() {
+            const accessToken = await getAccessToken();
 
-  async function launchWebSdk() {
-    const accessToken = await getAccessToken();
+            let snsWebSdkInstance = window.snsWebSdk
+              .init(
+                accessToken,
+                () => getAccessToken() // token refresh
+              )
+              .withConf({ lang: "en" })
+              .withOptions({ adaptIframeHeight: true })
+              .on("idCheck.onMessage", (type, payload) => {
+                if (type === "idCheck.finished") {
+                  alert("✅ Verification complete!");
+                }
+              })
+              .on("idCheck.onError", (error) => {
+                console.error("Sumsub error:", error);
+                alert("❌ Failed to load verification. Please try again.");
+              })
+              .build();
 
-    snsWebSdkInstance = window.snsWebSdk
-      .init(
-        accessToken,
-        () => getAccessToken() // token update callback
-      )
-      .withConf({ lang: "en" })
-      .withOptions({ adaptIframeHeight: true })
-      .on("idCheck.onMessage", (type, payload) => {
-        if (type === "idCheck.finished") {
-          alert(payload.reviewResult.reviewAnswer === "GREEN" 
-            ? '✅ Verified! Thank you.' 
-            : '❌ Verification failed. Please try again.');
-        }
-      })
-      .on("idCheck.onError", (error) => {
-        console.error("Sumsub error:", error);
-        document.getElementById('sumsub-websdk-container').innerHTML = 
-          '<p style="color:red; text-align:center; padding:40px;">Verification error. Please try again later.</p>';
-      })
-      .build();
+            snsWebSdkInstance.launch("#sumsub-websdk-container");
+          }
 
-    snsWebSdkInstance.launch("#sumsub-websdk-container");
-  }
-
-  launchWebSdk();
-</script>
+          launchWebSdk();
+        </script>
       </div>
     </div>
   </section>

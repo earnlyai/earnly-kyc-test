@@ -115,49 +115,44 @@
 
         <!-- SDK Script -->
         <script src="https://static.sumsub.com/idensic/static/sns-websdk-builder.js"></script>
-        <script>
-          // Fetch access token from your Vercel function
-          fetch('/api/token')
-            .then(response => response.json())
-            .then(({ accessToken, error }) => {
-              if (error) {
-                document.getElementById('sumsub-websdk-container').innerHTML = 
-                  '<p style="color:red; text-align:center; padding:40px;">Failed to load verification. Please refresh.</p>';
-                return;
-              }
+       <script>
+  let snsWebSdkInstance;
 
-              // Launch WebSDK 2.0
-              let snsWebSdkInstance = window.snsWebSdk
-                .init(
-                  accessToken,
-                  () => fetch('/api/token').then(r => r.json()).then(data => data.accessToken)
-                )
-                .withConf({ lang: "en" })
-                .withOptions({ adaptIframeHeight: true })
-                .on("idCheck.onMessage", (type, payload) => {
-                  if (type === "idCheck.finished") {
-                    if (payload.reviewResult.reviewAnswer === "GREEN") {
-                      alert("✅ Verification successful! Thank you.");
-                    } else {
-                      alert("❌ Verification failed. Please contact support.");
-                    }
-                  }
-                })
-                .on("idCheck.onError", (error) => {
-                  console.error("Sumsub error:", error);
-                  document.getElementById('sumsub-websdk-container').innerHTML = 
-                    '<p style="color:red; text-align:center; padding:40px;">Verification error. Please try again later.</p>';
-                })
-                .build();
+  async function getAccessToken() {
+    const res = await fetch('/api/token');
+    const { accessToken } = await res.json();
+    return accessToken;
+  }
 
-              snsWebSdkInstance.launch("#sumsub-websdk-container");
-            })
-            .catch(err => {
-              console.error("Fetch error:", err);
-              document.getElementById('sumsub-websdk-container').innerHTML = 
-                '<p style="color:red; text-align:center; padding:40px;">Unable to connect. Please check your internet.</p>';
-            });
-        </script>
+  async function launchWebSdk() {
+    const accessToken = await getAccessToken();
+
+    snsWebSdkInstance = window.snsWebSdk
+      .init(
+        accessToken,
+        () => getAccessToken() // token update callback
+      )
+      .withConf({ lang: "en" })
+      .withOptions({ adaptIframeHeight: true })
+      .on("idCheck.onMessage", (type, payload) => {
+        if (type === "idCheck.finished") {
+          alert(payload.reviewResult.reviewAnswer === "GREEN" 
+            ? '✅ Verified! Thank you.' 
+            : '❌ Verification failed. Please try again.');
+        }
+      })
+      .on("idCheck.onError", (error) => {
+        console.error("Sumsub error:", error);
+        document.getElementById('sumsub-websdk-container').innerHTML = 
+          '<p style="color:red; text-align:center; padding:40px;">Verification error. Please try again later.</p>';
+      })
+      .build();
+
+    snsWebSdkInstance.launch("#sumsub-websdk-container");
+  }
+
+  launchWebSdk();
+</script>
       </div>
     </div>
   </section>
